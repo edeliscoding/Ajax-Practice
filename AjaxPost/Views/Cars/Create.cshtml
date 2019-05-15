@@ -1,0 +1,80 @@
+﻿@model AjaxPost.Models.Car
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+<p>
+    
+</p>
+
+@using (Html.BeginForm("api/Create", "Cars"))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Car</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Model, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Model, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Model, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button class="btn-link js-create">Create</button>
+                @*<input type="submit" id="btn" value="Create" class="btn btn-default" />*@
+            </div>
+        </div>
+    </div>
+}
+    @*<div class="col-md-offset-2 col-md-10">
+        <button class="btn-link js-create">Create</button>
+        <input type="submit" id="btn" value="Create" class="btn btn-default" />*
+    </div>*@
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+
+
+@section Scripts {
+
+    <script>
+        $(".js-create").click(function (e) {
+            var create = $(e.target);
+            $.ajax({
+                method: "POST",
+                url: "Api/Cars",
+                dataType: 'json'
+             })
+                .done(function (data) {
+                $("p").text(data);
+              })
+        })
+        //$(".js-create").click(function () {
+        //    $.ajax({
+        //        method: "POST",
+        //        url: "/Api/CreateCar",
+        //        dataType: 'json'
+        //    })
+        //        .done(function (data) {
+        //            $("p").text(data);
+        //        })
+        //})
+    </script>
+    @Scripts.Render("~/bundles/jqueryval")
+}

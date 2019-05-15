@@ -1,0 +1,80 @@
+﻿@model IEnumerable<AjaxPost.Models.Animal>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+@for (char c = 'A'; c <= 'Z'; c++)
+{
+    
+    <button class="btn-link js-submit">@c</button>
+    
+}
+<table class="table animaltable" id="myTable">
+    <tr>
+        @*<th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>*@
+
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+
+            </td>
+
+        </tr>
+    }
+
+</table>
+@*<h3>Name</h3>
+<ul id="animalslist">
+    @foreach(var item in Model)
+    {
+        <li class="list">@Html.DisplayFor(modelItem => item.Name)</li>
+    }
+</ul>
+<h3 class="animalname"></h3>*@ 
+@section Scripts {
+    <script type="text/javascript">
+        $(".js-submit").on("click", function () {
+            var chardata = $(this).html();
+            var id = { character: chardata };
+            
+            $.ajax({
+                type: "Get",
+                data: JSON.stringify(id),
+                url: "/Animal/GetAnimals/" + chardata,
+                contentType: "application/json"
+        })
+                .done(function (data) {
+                    $('#myTable').find('tbody').empty();
+                    $.each(data, function (key, nameOfAnimal) {
+                        //$("#animalslist").hide();
+                        var myRow = "<tr><td>" + nameOfAnimal.Name + "</td></tr>";
+                        $('#myTable').find('tbody').append(myRow);
+                        //$("#animalslist").append('<li class="hidelist">' + nameOfAnimal.Name + '</li>');
+
+                        //$("#myTable > tbody").replaceWith('<tr><td>' + nameOfAnimal.Name + '</td></tr>');
+
+                    });
+                    
+                    
+            })
+                    .fail(function () {
+                        console.log("ajax failed");
+                    })
+            });
+
+    </script>
+    }

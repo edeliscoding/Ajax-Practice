@@ -1,0 +1,88 @@
+﻿@model IEnumerable<AjaxPost.Models.Car>
+
+@{
+    /**/
+
+    ViewBag.Title = "Mine";
+}
+
+<h2>Mine</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+@*@using (Html.BeginForm("EditCar", "Cars"))
+{*@
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Model)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.TextBoxFor(modelItem => item.Name, new { @class = "carName" , id = item.Id })
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Model)
+            </td>
+            <td>
+                @*@Html.HiddenFor(ModelItem => item.Id)*@
+            </td>
+            @*<td>
+                    @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+                </td>*@
+        </tr>
+    }
+</table>
+<input type="submit" class="btn btn-primary" id="submitCar2" value="Update" />
+
+
+
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $("#submitCar2").click(function (e) {
+            e.preventDefault();
+            var CarsArray = [];
+            $(function () {
+                $('.carName').each(function () {
+                    var id = $(this).attr("id");
+                    
+                    var text = $(this).val();
+                    @*var userName = "@HttpContext.Current.User.Identity.Name";*@
+                    var temp =
+                        {
+                          Id : id,
+                          Name: text
+                         };
+                    CarsArray.push(temp);
+                    //alert("Form submitted");
+                    });
+                    })
+                    $.ajax({
+                    type: "POST",
+                    url: "EditCar",
+                    data: JSON.stringify(CarsArray),
+                    success: function (data) {
+                    //alert(data.Result);
+                    },
+                    contentType: "application/json",
+                    traditional: true
+                    });
+                    });
+    </script>
+
+    @Scripts.Render("~/bundles/jqueryval")
+}

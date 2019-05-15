@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-1.10.2.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var ulCars = $("#ulCars");
+
+            $("#btn").click(function () {
+                $.ajax({
+                    type: 'GET',
+                    url: 'api/cars',
+                    dataType: 'json',
+                    success: function (data) {
+                        ulCars.empty();
+                        $.each(data, function (index, val) {
+                            var carName = val.Name + ' ' + val.Model;
+                            ulCars.append('<li>' + carName + '</li>')
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <input id="btn" type="button" value="Add a Car"/>
+    <ul id="ulCars"></ul>
+</body>
+</html>

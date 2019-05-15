@@ -1,0 +1,273 @@
+﻿@model AjaxPost.Models.ViewModel.CarViewModel
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+@*<p>
+        @Html.ActionLink("Create New", "Create")
+    </p>*@
+<table class="table carTable">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Car.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Car.Model)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Cars)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Model)
+            </td>
+            <td>
+                @*@Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id=item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id=item.Id })*@
+            </td>
+        </tr>
+    }
+
+</table>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Car</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Car.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Car.Name, new { htmlAttributes = new { @class = "form-control name" } })
+                @Html.ValidationMessageFor(model => model.Car.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Car.Model, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Car.Model, new { htmlAttributes = new { @class = "form-control model" } })
+                @Html.ValidationMessageFor(model => model.Car.Model, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+    </div>
+}
+
+<div class="col-md-offset-2 col-md-10">
+    @*<button class="btn-link js-create">Create</button>*@
+    <input type="submit" id="btn1stForm" value="Create" class="btn btn-default" />
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Car.Name, new { htmlAttributes = new { @class = "form-control" } })
+
+            @Html.DropDownListFor(model => model.Car.Name, new SelectList(Model.Cars, "Id", "Name"), new { @class = "form-control", id = "js-name" })
+
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Car.Model, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.TextBoxFor(model => model.Car.Model, new { @class = "form-control", id = "js-model" })
+        </div>
+    </div>
+}
+
+<p id="paragraph"></p>
+
+<div class="container">
+
+    <h1>Add a Car <i class="fa fa-plus jq-add"></i></h1>
+    <input type="text" class="car" />
+
+
+    <ul id="myUl"></ul>
+    <input id="submitCar" type="submit" class="btn btn-success" value="Submit Cars" />
+
+</div>
+
+<br />
+<hr />
+<div class="input_fields_wrap">
+    <button class="add_field_button btn btn-primary">Add More Fields</button>
+    <div>
+        <input type="text" class="" name="mytext[]">
+    </div>
+</div>
+@*@HttpContext.Current.User.Identity.Name*@
+<input id="submitCar2" type="submit" class="btn btn-success" value="Submit Cars" />
+
+@section Scripts {
+    <script type="text/javascript">
+        //this is the jquery code for the table when users create car name and model which is the first form
+        $("#btn1stForm").click(function () {
+            var name = $(".name").val();
+            var model = $(".model").val();
+            var data = { Name: name, Model: model };
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify(data),
+                url: "../api/cars",
+                contentType: "application/json"
+            })
+                .done(function () {
+                    $(".carTable > tbody").append('<tr><td>' + data.Name + '</td>' + '<td>' + data.Model + '</td> </tr>');
+                })
+
+        });
+    </script>
+
+    <script type="text/javascript">
+        //this is the dropdown name and model to auto populates based on name
+        $("#js-name").on("change", function () {
+            var data = $("#js-name").val();
+            var Id = { Id: data };
+            $.ajax({
+                type: "POST",
+                data: JSON.stringify(Id),
+                url: "search",
+                contentType: "application/json"
+            })
+                .done(function (returneddata) {
+                    $("#js-model").val(returneddata.Model);
+                    //$("#js-model").text(data.Model);
+                })
+                .fail(function () {
+                    console.log("ajax failed");
+                })
+        });
+
+    </script>
+
+    <script type="text/javascript">
+        //this is add more fields form that creates more fields when you click 'Add more Fields button'
+        $(document).ready(function () {
+            var max_fields = 10; //maximum input boxes allowed
+            var wrapper = $(".input_fields_wrap"); //Fields wrapper
+            var add_button = $(".add_field_button"); //Add button ID
+
+            var x = 1; //initlal text box count
+            $(add_button).click(function (e) { //on add input button click
+                e.preventDefault();
+                if (x < max_fields) { //max input box allowed
+                    x++; //text box increment
+                    $(wrapper).append('<div><input class="" type="text" name="mytext[]"/><a href="#" class="remove_field">Remove</a></div>'); //add input box
+                }
+            });
+
+            $(wrapper).on("click", ".remove_field", function (e) { //user click on remove text
+                e.preventDefault(); $(this).parent('div').remove(); x--;
+            })
+        });
+
+        $("#submitCar2").click(function () {
+            var CarsArray = [];
+            $(function () {
+                $('input[name^="mytext"]').each(function () {
+                    var text = $(this).val();
+                    var userName = "@HttpContext.Current.User.Identity.Name";
+                    //console.log(userName);
+
+                    var temp = {
+                        Name: text,
+                        Employee: userName
+                    };
+                    CarsArray.push(temp);
+                    //Cars.push($(this).text());
+                    //alert("Form submitted");
+                });
+            })
+            $.ajax({
+                type: "POST",
+                url: "CarSearch",
+                data: JSON.stringify(CarsArray),
+                success: function (data) {
+                    //alert(data.Result);
+                    console.log(data);
+                },
+                contentType: "application/json",
+                traditional: true
+            });
+        });
+      
+
+        //this is Add a Car with + that adds to a list and submit all at once.
+        $(".jq-add").on("click", function () {
+            var carText = $(".car").val();
+            $("#myUl").append("<li>" + carText + "</li>");
+            $(".car").val('').focus();
+
+        });
+
+        $("#submitCar").click(function () {
+            var CarsArray = [];
+            $(function () {
+                $("#myUl li").each(function () {
+                    var text = $(this).text();
+
+                    var temp = {
+                        Name: text
+                    };
+                    CarsArray.push(temp);
+                    //Cars.push($(this).text());
+                });
+            })
+            $.ajax({
+                type: "POST",
+                url: "CarSearch",
+                data: JSON.stringify(CarsArray),
+                success: function (data) {
+                    alert(data);
+                },
+                contentType: "application/json",
+                traditional: true
+            });
+        });
+    </script>
+
+
+    @*original
+        <script type="text/javascript">
+            $(document).ready(function () {
+                var ulCars = $("#ulCars");
+
+                $("#btn").click(function () {
+                    $.ajax({
+                        type: 'GET',
+                        url: 'api/cars',
+                        dataType: 'json',
+                        success: function (data) {
+                            ulCars.empty();
+                            $.each(data, function (index, val) {
+                                var carName = val.Name + ' ' + val.Model;
+                                ulCars.append('<li>' + carName + '</li>')
+                            });
+                        }
+                    })
+                })
+            });
+        </script>
+    *@
+
+
+
+
+    @Scripts.Render("~/bundles/jqueryval")
+}
